@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>阿宝云</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Microsoft Yahei", sans-serif;
+            scroll-behavior: smooth;
+        }
+
+        /* 顶部导航栏 */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: #fff;
+            z-index: 999;
+            border-bottom: 1px solid #eee;
+        }
+
+        .header-top {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem 1rem;
+            position: relative;
+        }
+
+        /* 移动端菜单按钮 */
+        .menu-toggle {
+            display: none;
+            font-size: 1.5rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        /* Logo 区域：阿宝云 + 左右云纹 */
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .cloud-pattern {
+            width: 60px;
+            height: 30px;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 30"><path d="M0,15 Q15,0 30,15 T60,15" fill="none" stroke="#333" stroke-width="2"/></svg>');
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+
+        /* 桌面端导航 */
+        .desktop-nav {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            gap: 2.5rem;
+            padding: 0.5rem 0;
+        }
+
+        .nav-item {
+            position: relative;
+            cursor: pointer;
+            padding: 0.5rem 0;
+        }
+
+        .nav-item > span {
+            font-size: 1.1rem;
+            color: #333;
+            transition: color 0.3s;
+        }
+
+        .nav-item:hover > span {
+            color: #0071e3;
+        }
+
+        /* 下拉菜单 */
+        .dropdown {
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #fff;
+            border: 1px solid #eee;
+            border-radius: 4px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            min-width: 160px;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+
+        .nav-item:hover .dropdown {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .dropdown a {
+            display: block;
+            padding: 0.75rem 1rem;
+            color: #333;
+            text-decoration: none;
+            transition: background 0.3s;
+        }
+
+        .dropdown a:hover {
+            background: #f5f5f7;
+        }
+
+        /* 移动端菜单 */
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            left: -100%;
+            width: 80%;
+            max-width: 300px;
+            height: 100vh;
+            background: #fff;
+            box-shadow: 2px 0 12px rgba(0,0,0,0.1);
+            transition: left 0.3s;
+            z-index: 998;
+            padding-top: 80px;
+        }
+
+        .mobile-menu.active {
+            left: 0;
+        }
+
+        .mobile-nav-item {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .mobile-nav-item > span {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.1rem;
+            color: #333;
+            cursor: pointer;
+        }
+
+        .mobile-dropdown {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s;
+        }
+
+        .mobile-dropdown.active {
+            max-height: 500px;
+        }
+
+        .mobile-dropdown a {
+            display: block;
+            padding: 0.75rem 1.5rem;
+            color: #666;
+            text-decoration: none;
+            font-size: 0.95rem;
+        }
+
+        /* 页面内容区域 */
+        main {
+            margin-top: 120px;
+        }
+
+        section {
+            min-height: calc(100vh - 120px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: #333;
+        }
+
+        section:nth-child(odd) {
+            background: #f5f5f7;
+        }
+
+        /* 响应式适配 */
+        @media (max-width: 768px) {
+            .desktop-nav {
+                display: none;
+            }
+            .menu-toggle {
+                display: block;
+            }
+            .logo {
+                font-size: 2rem;
+            }
+            .cloud-pattern {
+                width: 40px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-top">
+            <!-- 移动端菜单按钮 -->
+            <button class="menu-toggle" id="menuToggle">☰</button>
+
+            <!-- Logo：阿宝云 + 左右云纹 -->
+            <div class="logo">
+                <div class="cloud-pattern"></div>
+                阿宝云
+                <div class="cloud-pattern"></div>
+            </div>
+        </div>
+
+        <!-- 桌面端导航 -->
+        <nav class="desktop-nav">
+            <div class="nav-item">
+                <span>一言堂</span>
+                <div class="dropdown">
+                    <a href="#page1"> </a>
+                </div>
+            </div>
+            <div class="nav-item">
+                <span>一课间</span>
+                <div class="dropdown">
+                    <a href="#page2"> </a>
+                </div>
+            </div>
+            <div class="nav-item">
+                <span>一雅集</span>
+                <div class="dropdown">
+                    <a href="#page3"> </a>
+                </div>
+            </div>
+            <div class="nav-item">
+                <span>一基金</span>
+                <div class="dropdown">
+                    <a href="#page4"> </a>
+                </div>
+            </div>
+            <div class="nav-item">
+                <span> 一工社</span>
+                <div class="dropdown">
+                    <a href="#page5"> </a>
+                </div>
+            </div>
+            
+                   <div class="nav-item">
+                <span>一行诗</span>
+                <div class="dropdown">
+                    <a href="#page6"> </a>
+                </div>
+            </div>
+            
+        </nav>
+
+        <!-- 移动端菜单 -->
+        <div class="mobile-menu" id="mobileMenu">
+            <div class="mobile-nav-item">
+                <span onclick="toggleMobileDropdown(this)">首页 <span>▼</span></span>
+                <div class="mobile-dropdown">
+                    <a href="#page1">测试</a>
+                </div>
+            </div>
+            <div class="mobile-nav-item">
+                <span onclick="toggleMobileDropdown(this)">一 <span>▼</span></span>
+                <div class="mobile-dropdown">
+                    <a href="#page2"> 二</a>
+                </div>
+            </div>
+            
+            <div class="mobile-nav-item">
+                <span onclick="toggleMobileDropdown(this)"> 三 <span>▼</span></span>
+                <div class="mobile-dropdown">
+                    <a href="#page3">三</a>
+                </div>
+            </div>
+            
+            <div class="mobile-nav-item">
+                <span onclick="toggleMobileDropdown(this)">  <span>▼</span></span>
+                <div class="mobile-dropdown">
+                    <a href="#page4"> </a>
+                </div>
+            </div>
+            
+            <div class="mobile-nav-item">
+                <span onclick="toggleMobileDropdown(this)">五 <span>▼</span></span>
+                <div class="mobile-dropdown">
+                    <a href="#page5">五</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section id="page1">一个人 云服务</section>
+        <section id="page2">二</section>
+        <section id="page3">三</section>
+        <section id="page4">四</section>
+        <section id="page5">五</section>
+         <section id="page5">六</section>
+          <section id="page5">七</section>
+    </main>
+
+    <script>
+        // 移动端菜单切换
+        const menuToggle = document.getElementById('menuToggle');
+        const mobileMenu = document.getElementById('mobileMenu');
+
+        menuToggle.addEventListener('click', () => {
+            mobileMenu.classList.toggle('active');
+        });
+
+        // 移动端下拉菜单切换
+        function toggleMobileDropdown(el) {
+            const dropdown = el.nextElementSibling;
+            dropdown.classList.toggle('active');
+        }
+
+        // 点击链接后关闭移动端菜单
+        document.querySelectorAll('.mobile-dropdown a, .dropdown a').forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.remove('active');
+            });
+        });
+    </script>
+</body>
+</html>
